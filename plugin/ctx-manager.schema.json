@@ -1,0 +1,128 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "OpenCode Context Manager Configuration",
+    "description": "Configuration schema for the opencode-ctx-manager plugin",
+    "type": "object",
+    "properties": {
+        "enabled": {
+            "type": "boolean",
+            "default": true,
+            "description": "Enable or disable the context manager plugin"
+        },
+        "debug": {
+            "type": "boolean",
+            "default": false,
+            "description": "Enable debug logging"
+        },
+        "pruneNotification": {
+            "type": "string",
+            "enum": ["off", "minimal", "detailed"],
+            "default": "minimal",
+            "description": "Notification level for pruning events"
+        },
+        "pruneNotificationType": {
+            "type": "string",
+            "enum": ["chat", "toast"],
+            "default": "toast",
+            "description": "How pruning notifications are displayed"
+        },
+        "mcp": {
+            "type": "object",
+            "description": "MCP server configuration",
+            "properties": {
+                "command": {
+                    "type": "string",
+                    "default": "python",
+                    "description": "Command to launch the Python MCP server"
+                },
+                "args": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "default": ["-m", "mcp_server"],
+                    "description": "Arguments for the MCP server command"
+                },
+                "cwd": {
+                    "type": "string",
+                    "default": "./server",
+                    "description": "Working directory for the MCP server"
+                }
+            },
+            "additionalProperties": false
+        },
+        "importance": {
+            "type": "object",
+            "description": "Importance scoring configuration",
+            "properties": {
+                "autoScore": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable automatic ML-based importance scoring"
+                },
+                "threshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                    "default": 3.0,
+                    "description": "Importance threshold below which content is prunable"
+                },
+                "protectedThreshold": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 10,
+                    "default": 7.0,
+                    "description": "Importance threshold above which content is never pruned"
+                }
+            },
+            "additionalProperties": false
+        },
+        "session": {
+            "type": "object",
+            "description": "Session recording configuration",
+            "properties": {
+                "extendedRecording": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable extended session recording with edit metadata"
+                },
+                "captureEditMetadata": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Capture reason, goal contribution, and tradeoffs for edits"
+                }
+            },
+            "additionalProperties": false
+        },
+        "pruning": {
+            "type": "object",
+            "description": "Context pruning configuration",
+            "properties": {
+                "blastRadiusExpansion": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Consider interconnected files when determining importance for pruning"
+                },
+                "maxCompressionRatio": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "default": 0.3,
+                    "description": "Maximum fraction of context that can be compressed"
+                }
+            },
+            "additionalProperties": false
+        },
+        "commands": {
+            "type": "object",
+            "description": "Slash command configuration",
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable /ctx slash commands"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

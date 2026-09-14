@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.mypy_cache/
+
+# Build outputs
+dist/
+*.egg-info/
+build/
+
+# Runtime data (models, sessions, training)
+data/models/
+data/sessions/
+data/training/
+!data/config.yaml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Environment
+.env
+.env.local
+.venv/
+venv/
+
+# OpenCode local storage
+.opencode/storage/

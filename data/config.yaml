@@ -1,0 +1,22 @@
+interconnectedness:
+  files:
+    src/a.py:
+      src/b.py:
+        context: ''
+        relation: calls
+        weight: 0.9
+      src/d.py:
+        context: ''
+        relation: calls
+        weight: 0.6
+    src/b.py:
+      src/a.py:
+        context: ''
+        relation: co_edits
+        weight: 1.0
+      src/c.py:
+        context: ''
+        relation: imports
+        weight: 0.7
+  functions: {}
+version: '1.0'
