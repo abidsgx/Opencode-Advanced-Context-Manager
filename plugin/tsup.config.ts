@@ -6,5 +6,5 @@ export default defineConfig({
     dts: false,
     clean: true,
     sourcemap: true,
-    noExternal: ["jsonc-parser"],
+    noExternal: ["jsonc-parser", "@anthropic-ai/tokenizer"],
 })
