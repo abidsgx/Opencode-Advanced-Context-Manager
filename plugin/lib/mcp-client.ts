@@ -6,12 +6,19 @@ export interface McpToolResult {
     content: Array<{ type: string; text: string }>
 }
 
+export interface McpInitializeResult {
+    protocolVersion: string
+    capabilities: Record<string, unknown>
+    serverInfo: { name: string; version: string }
+}
+
 export class McpClient {
     private process: ChildProcess | null = null
     private config: McpConfig
     private requestId: number = 0
     private pending: Map<number, { resolve: (result: unknown) => void; reject: (error: Error) => void }> = new Map()
     private buffer: string = ""
+    private initialized: boolean = false
 
     constructor(config: McpConfig) {
         this.config = config
@@ -42,6 +49,7 @@ export class McpClient {
 
         this.process.on("close", () => {
             this.process = null
+            this.initialized = false
             for (const [, pending] of this.pending) {
                 pending.reject(new Error("MCP process closed"))
             }
@@ -74,7 +82,52 @@ export class McpClient {
         }
     }
 
+    async initialize(): Promise<McpInitializeResult | null> {
+        if (this.initialized) return null
+
+        try {
+            const proc = this.ensureProcess()
+            const id = ++this.requestId
+
+            const request = {
+                jsonrpc: "2.0",
+                id,
+                method: "initialize",
+                params: {
+                    protocolVersion: "2024-11-05",
+                    capabilities: {},
+                    clientInfo: { name: "ctx-manager-plugin", version: "0.1.0" },
+                },
+            }
+
+            return new Promise((resolve, reject) => {
+                this.pending.set(id, {
+                    resolve: (result: unknown) => {
+                        this.initialized = true
+                        resolve(result as McpInitializeResult)
+                    },
+                    reject,
+                })
+
+                proc.stdin?.write(JSON.stringify(request) + "\n")
+
+                setTimeout(() => {
+                    if (this.pending.has(id)) {
+                        this.pending.delete(id)
+                        reject(new Error("MCP initialize timed out"))
+                    }
+                }, 10000)
+            })
+        } catch (err) {
+            appendDiagnostic(`MCP initialize failed: ${String(err)}`)
+            return null
+        }
+    }
+
     async call(tool: string, args: Record<string, unknown>): Promise<Record<string, unknown> | null> {
+        if (!this.initialized) {
+            await this.initialize()
+        }
         try {
             const proc = this.ensureProcess()
             const id = ++this.requestId
@@ -126,5 +179,6 @@ export class McpClient {
             this.process.kill()
             this.process = null
         }
+        this.initialized = false
     }
 }

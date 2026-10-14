@@ -60,6 +60,7 @@
     "files": [
         "dist/",
         "lib/",
+        "server/",
         "tui.tsx",
         "README.md"
     ],

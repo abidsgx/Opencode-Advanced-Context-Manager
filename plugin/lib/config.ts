@@ -1,11 +1,14 @@
 import * as fs from "node:fs"
 import * as path from "node:path"
 import { parse as parseJsonc } from "jsonc-parser"
+import { resolveMcpConfig } from "./server-resolver"
 
 export interface McpConfig {
     command: string
     args: string[]
     cwd: string
+    autoDetect?: boolean
+    preferLocal?: boolean
 }
 
 export interface ImportanceConfig {
@@ -50,6 +53,8 @@ const DEFAULT_CONFIG: PluginConfig = {
         command: "python",
         args: ["-m", "mcp_server"],
         cwd: "./server",
+        autoDetect: true,
+        preferLocal: true,
     },
     importance: {
         autoScore: true,
@@ -137,6 +142,16 @@ export async function loadConfig(directory: string): Promise<PluginConfig> {
         } catch {
             // Ignore invalid project config
         }
+    }
+
+    if (config.mcp?.autoDetect !== false) {
+        const userMcpConfig = config.mcp ? {
+            command: config.mcp.command,
+            args: config.mcp.args,
+            preferLocal: config.mcp.preferLocal,
+        } : undefined
+        const resolved = resolveMcpConfig(directory, userMcpConfig)
+        config.mcp = { ...config.mcp, ...resolved }
     }
 
     return config

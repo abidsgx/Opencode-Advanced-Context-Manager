@@ -13,33 +13,33 @@ import yaml
 @dataclass
 class FeatureVector:
     # Temporal features
-    time_spent_on_file: float = 0.0
-    time_spent_ratio: float = 0.0
-    edit_frequency: float = 0.0
-    recency_score: float = 0.0
+    time_spent_on_file: float = 0.0 # Total seconds spent editing
+    time_spent_ratio: float = 0.0 # Time on this file / total session time
+    edit_frequency: float = 0.0 # Edits per minute
+    recency_score: float = 0.0 # Exponential decay of last edit time
 
     # Structural features
-    lines_changed: int = 0
-    lines_changed_ratio: float = 0.0
-    functions_modified: int = 0
-    call_depth: int = 0
+    lines_changed: int = 0 # Total lines modified
+    lines_changed_ratio: float = 0.0 # Lines changed / total file lines
+    functions_modified: int = 0 # Number of distinct functions touched
+    call_depth: int = 0 # Depth in call graph from entry point
 
     # Graph features
-    degree_centrality: float = 0.0
-    betweenness_centrality: float = 0.0
-    cluster_id: int = 0
-    dependency_count: int = 0
-    dependents_count: int = 0
+    degree_centrality: float = 0.0 # How connected in the dependency graph
+    betweenness_centrality: float = 0.0 # Bridge between clusters
+    cluster_id: int = 0 # Which module cluster it belongs to
+    dependency_count: int = 0 # Number of files this depends on
+    dependents_count: int = 0 # Number of files that depend on this
 
     # Edit pattern features
-    revert_count: int = 0
-    iteration_count: int = 0
-    cross_file_edits: int = 0
+    revert_count: int = 0 # Times this file was reverted
+    iteration_count: int = 0 # Times this file was re-edited after initial change
+    cross_file_edits: int = 0 # Edits to this file that co-occur with edits elsewhere
 
     # Composite features
-    dependency_x_time: float = 0.0
-    centrality_x_frequency: float = 0.0
-    cluster_isolation: float = 0.0
+    dependency_x_time: float = 0.0 # dependency_count * time_spent_ratio
+    centrality_x_frequency: float = 0.0 # degree_centrality * edit_frequency
+    cluster_isolation: float = 0.0 # 1.0 if only file in cluster, 0.0 if highly connected
 
     def to_array(self) -> np.ndarray:
         return np.array([
